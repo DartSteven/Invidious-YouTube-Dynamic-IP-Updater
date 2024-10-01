@@ -1,0 +1,12 @@
+[Unit]
+Description=Monitor IP changes and update docker-compose environment
+After=docker.service
+Requires=docker.service
+
+[Service]
+ExecStart=/media/docker/compose/Invidious/monitor_ipv4.sh
+Restart=always
+WorkingDirectory=/media/docker/compose/Invidious
+
+[Install]
+WantedBy=multi-user.target
