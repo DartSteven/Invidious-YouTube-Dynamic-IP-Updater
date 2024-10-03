@@ -1,4 +1,4 @@
-# Invidious IPv4 Change - YouTube Trusted Session Generator
+# Invidious YouTube Dynamic IP Updater
 
 This repository provides a Bash script that monitors changes in the public IPv4 address and automatically updates the `visitor_data` and `po_token` fields in the Invidious Docker Compose configuration. It uses the YouTube Trusted Session Generator to retrieve fresh credentials whenever the public IP changes and seamlessly restarts the Invidious Docker container with the new values.
 
@@ -20,7 +20,7 @@ This repository provides a Bash script that monitors changes in the public IPv4 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/Invidious-ipv4change-youtube-trusted-session-generator.git
+git clone https://github.com/yourusername/Invidious-YouTube-Dynamic-IP-Updater.git
 cd Invidious-ipv4change-youtube-trusted-session-generator
 ```
 
@@ -102,7 +102,3 @@ The script will automatically update these values whenever the public IP changes
 1. **IP Monitoring**: The script uses `curl` to monitor the public IP address from an external service like `ifconfig.me`.
 2. **Session Generation**: When an IP change is detected, the script runs the YouTube Trusted Session Generator to fetch new `visitor_data` and `po_token`.
 3. **Docker Compose Update**: The script updates the `docker-compose.yaml` file with the new values and restarts the Invidious container.
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
