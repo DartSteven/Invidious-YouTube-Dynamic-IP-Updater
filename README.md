@@ -20,7 +20,7 @@ This repository provides a Bash script that monitors changes in the public IPv4 
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/Invidious-YouTube-Dynamic-IP-Updater.git
+git clone https://github.com/DartSteven/Invidious-YouTube-Dynamic-IP-Updater.git
 cd Invidious-ipv4change-youtube-trusted-session-generator
 ```
 
