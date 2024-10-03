@@ -1,14 +1,41 @@
 #!/bin/bash
 
 # File paths
-GENERATOR_OUTPUT="/media/docker/compose/Invidious/generator.txt"
-DOCKER_COMPOSE_FILE="/media/docker/compose/Invidious/docker-compose.yaml"
-DOCKER_COMPOSE_DIR="/media/docker/compose/Invidious"
+GENERATOR_OUTPUT="/media/lvm/docker/compose/Invidious/generator.txt"
+DOCKER_COMPOSE_FILE="/media/lvm/docker/compose/Invidious/docker-compose.yaml"
+DOCKER_COMPOSE_DIR="/media/lvm/docker/compose/Invidious"
 LOG_FILE="$DOCKER_COMPOSE_DIR/ipv4_visitor-data_po-token.log"
 
 # Set DEBUG to YES or NO
 DEBUG="YES"
 no_internet_since=""
+
+# Name to assign to the container
+CONTAINER_NAME="Invidious-youtube-trusted-session-generator"
+
+# Time to wait between IP checks in seconds
+CHECK_TIME_IP=60
+
+
+
+
+
+
+
+
+
+#####################################################################################################################################
+#       DO NOT EDIT BELOW THIS LINE - DO NOT EDIT BELOW THIS LINE - DO NOT EDIT BELOW THIS LINE - DO NOT EDIT BELOW THIS LINE       #
+#       DO NOT EDIT BELOW THIS LINE - DO NOT EDIT BELOW THIS LINE - DO NOT EDIT BELOW THIS LINE - DO NOT EDIT BELOW THIS LINE       #
+#       DO NOT EDIT BELOW THIS LINE - DO NOT EDIT BELOW THIS LINE - DO NOT EDIT BELOW THIS LINE - DO NOT EDIT BELOW THIS LINE       #
+#       DO NOT EDIT BELOW THIS LINE - DO NOT EDIT BELOW THIS LINE - DO NOT EDIT BELOW THIS LINE - DO NOT EDIT BELOW THIS LINE       #
+#       DO NOT EDIT BELOW THIS LINE - DO NOT EDIT BELOW THIS LINE - DO NOT EDIT BELOW THIS LINE - DO NOT EDIT BELOW THIS LINE       #
+#####################################################################################################################################
+
+
+
+
+
 
 # Function to log messages with date and time
 log_message() {
@@ -90,15 +117,23 @@ run_docker_compose_up() {
 
 # Function to remove the Docker container after session generation
 cleanup_docker_container() {
-    log_message "Cleaning up unused Docker container."
-    container_id=$(sudo docker ps -a -q --filter "ancestor=quay.io/invidious/youtube-trusted-session-generator" --format="{{.ID}}" | tail -n 1)
-    
+    log_message "Cleaning up Docker container: $CONTAINER_NAME"
+
+    # Find the container ID with the specified name
+    container_id=$(sudo docker ps -a -q --filter "name=$CONTAINER_NAME")
+
     if [ -n "$container_id" ]; then
         sudo docker rm "$container_id" >> "$LOG_FILE"
-        log_message "Removed container: $container_id"
+        log_message "Removed container: $container_id (Name: $CONTAINER_NAME)"
     else
         log_message "No container found for cleanup."
     fi
+}
+
+# Function to run the Docker command to generate the generator.txt file with a specific container name
+run_docker_session_generator() {
+    log_message "Running Docker session generator..."
+    sudo docker run --name "$CONTAINER_NAME" quay.io/invidious/youtube-trusted-session-generator > "$GENERATOR_OUTPUT"
 }
 
 # Run the replacement of the values and restart docker compose immediately
@@ -106,7 +141,7 @@ log_message "Running the Docker command for the first time and updating values..
 check_service_status
 
 # Run the Docker command to generate the generator.txt file
-sudo docker run quay.io/invidious/youtube-trusted-session-generator > "$GENERATOR_OUTPUT"
+run_docker_session_generator
 
 # Extract visitor_data and po_token
 extract_data
@@ -138,7 +173,7 @@ while true; do
             log_message "Public IP changed from $previous_ipv4 to $current_ipv4."
 
             # Run the Docker command to generate the generator.txt file
-            sudo docker run quay.io/invidious/youtube-trusted-session-generator > "$GENERATOR_OUTPUT"
+            run_docker_session_generator
 
             # Extract visitor_data and po_token
             extract_data
@@ -160,6 +195,6 @@ while true; do
         fi
     fi
 
-    # Wait 1 minute before checking the IP again
-    sleep 60
+    # Wait before checking the IP again
+    sleep "$CHECK_TIME_IP"
 done
